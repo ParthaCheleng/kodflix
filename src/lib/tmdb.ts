@@ -7,18 +7,21 @@ const MOCK_DATA = {
             id: 1,
             title: "Money Heist - Fallback",
             name: "Money Heist - Fallback",
-            backdrop_path: "/xGexTKCJDkl12d89pgHAHK815Tf.jpg",
-            poster_path: "/xGexTKCJDkl12d89pgHAHK815Tf.jpg",
+            backdrop_path: "https://images.unsplash.com/photo-1626814026160-2237a95fc5a0", // Absolute external image
+            poster_path: "https://images.unsplash.com/photo-1626814026160-2237a95fc5a0",
             overview: "Eight thieves take hostages and lock themselves in the Royal Mint of Spain as a criminal mastermind manipulates the police to carry out his plan.",
             vote_average: 8.8,
-            popularity: 100
+            popularity: 100,
+            videos: {
+                results: [{ type: "Trailer", site: "YouTube", key: "p_PJbmrXvO0" }] // Money Heist trailer
+            }
         },
         {
             id: 2,
             title: "Stranger Things - Fallback",
             name: "Stranger Things - Fallback",
-            backdrop_path: "/56v2KjBlU4XaOv9rVYEQypROD7P.jpg",
-            poster_path: "/56v2KjBlU4XaOv9rVYEQypROD7P.jpg",
+            backdrop_path: "https://images.unsplash.com/photo-1616530940355-351fabd9524b", // Absolute external image
+            poster_path: "https://images.unsplash.com/photo-1616530940355-351fabd9524b",
             overview: "When a young boy vanishes, a small town uncovers a mystery involving secret experiments, terrifying supernatural forces and one strange little girl.",
             vote_average: 8.6,
             popularity: 90
@@ -80,7 +83,7 @@ export const getMoviesByCategory = async (endpoint: string, extraParams: Record<
 };
 
 export const getImageUrl = (path: string, size: string = 'original') => {
-    // If the path is missing or we are using block-fallback, point to a placeholder.
-    // We'll just return the TMDB URL and rely on Next/Image to handle it, or we can use a generic placeholder if TMDB images are blocked too.
-    return path ? `https://image.tmdb.org/t/p/${size}${path}` : '';
+    if (!path) return '';
+    if (path.startsWith('http')) return path; // Support absolute paths for fallback
+    return `https://image.tmdb.org/t/p/${size}${path}`;
 };

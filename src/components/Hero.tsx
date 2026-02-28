@@ -27,7 +27,7 @@ export default function Hero({ movieDetails }: HeroProps) {
                     <div className="relative w-full h-[140%] -top-[20%] pointer-events-none">
                         <iframe
                             className="w-full h-full object-cover"
-                            src={`https://www.youtube.com/embed/${trailer.key}?autoplay=1&mute=1&controls=0&loop=1&playlist=${trailer.key}&modestbranding=1&rel=0&showinfo=0`}
+                            src={`https://www.youtube.com/embed/${trailer.key}?autoplay=1&mute=1&controls=0&loop=1&playlist=${trailer.key}&modestbranding=1&rel=0&showinfo=0&origin=https://kodflix-clone.vercel.app`}
                             allow="autoplay; encrypted-media"
                             allowFullScreen
                         />

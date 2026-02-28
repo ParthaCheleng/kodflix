@@ -14,7 +14,7 @@ const MOCK_DATA = {
             vote_average: 8.8,
             popularity: 100,
             videos: {
-                results: [{ type: "Trailer", site: "YouTube", key: "p_PJbmrXvO0" }] // Money Heist trailer
+                results: [{ type: "Trailer", site: "YouTube", key: "p_PJbmrXvO0" }]
             }
         },
         {
@@ -22,7 +22,7 @@ const MOCK_DATA = {
             title: "Stranger Things - Fallback",
             name: "Stranger Things - Fallback",
             media_type: "tv",
-            backdrop_path: "https://images.unsplash.com/photo-1616530940355-351fabd9524b", // Absolute external image
+            backdrop_path: "https://images.unsplash.com/photo-1616530940355-351fabd9524b",
             poster_path: "https://images.unsplash.com/photo-1616530940355-351fabd9524b",
             overview: "When a young boy vanishes, a small town uncovers a mystery involving secret experiments, terrifying supernatural forces and one strange little girl.",
             vote_average: 8.6,
@@ -31,22 +31,41 @@ const MOCK_DATA = {
     ]
 };
 
+/**
+ * Defensive TMDB fetcher.
+ * - Bails out immediately if API_KEY is missing (avoids sending bad requests).
+ * - Uses AbortController with a 8-second timeout to prevent hanging.
+ * - Returns MOCK_DATA on ANY failure so the UI never crashes.
+ */
 const fetchFromTMDB = async (endpoint: string, params: Record<string, string> = {}) => {
+    // If there is no API key at all, skip the network call entirely
+    if (!API_KEY) return MOCK_DATA;
+
     const queryParams = new URLSearchParams({
-        api_key: API_KEY || '',
+        api_key: API_KEY,
         ...params,
     });
 
+    const url = `${BASE_URL}${endpoint}?${queryParams.toString()}`;
+
     try {
-        const response = await fetch(`${BASE_URL}${endpoint}?${queryParams.toString()}`);
+        const controller = new AbortController();
+        const timeoutId = setTimeout(() => controller.abort(), 8000);
+
+        const response = await fetch(url, {
+            signal: controller.signal,
+            cache: 'no-store', // Prevent Next.js from caching failed responses
+        });
+
+        clearTimeout(timeoutId);
+
         if (!response.ok) {
-            console.warn(`TMDB fetch failed with status: ${response.status}. Using mock data.`);
             return MOCK_DATA;
         }
+
         return await response.json();
-    } catch (error) {
-        console.error("Network error accessing TMDB. Connection might be blocked:", error);
-        // Fallback to MOCK_DATA to prevent crashing the whole app
+    } catch {
+        // Silently fall back – covers TypeError (network down), AbortError (timeout), etc.
         return MOCK_DATA;
     }
 };
@@ -67,7 +86,7 @@ export const getTrendingMoviesAndTV = async () => {
         ]);
         const combined = [...(movies?.results || []), ...(tv?.results || [])].sort((a, b) => b.popularity - a.popularity);
         return { results: combined.length ? combined : MOCK_DATA.results };
-    } catch (e) {
+    } catch {
         return MOCK_DATA;
     }
 };
@@ -88,8 +107,8 @@ export const getImageUrl = (path: string, size: string = 'original') => {
     if (!path) {
         return size === 'original'
             ? 'https://images.unsplash.com/photo-1626814026160-2237a95fc5a0'
-            : 'https://images.unsplash.com/photo-1616530940355-351fabd9524b'; // Fallback for missing posters
+            : 'https://images.unsplash.com/photo-1616530940355-351fabd9524b';
     }
-    if (path.startsWith('http')) return path; // Support absolute paths for fallback
+    if (path.startsWith('http')) return path;
     return `https://image.tmdb.org/t/p/${size}${path}`;
 };

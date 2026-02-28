@@ -2,13 +2,20 @@
 
 import Link from "next/link";
 import { Search, Bell, Menu, X } from "lucide-react";
-import { usePathname } from "next/navigation";
-import { useState, useEffect } from "react";
+import { usePathname, useRouter } from "next/navigation";
+import { useState, useEffect, useRef } from "react";
+import { motion, AnimatePresence } from "framer-motion";
 
 export default function Navbar() {
     const pathname = usePathname();
+    const router = useRouter();
     const [isScrolled, setIsScrolled] = useState(false);
     const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
+
+    // Search State
+    const [searchOpen, setSearchOpen] = useState(false);
+    const [searchQuery, setSearchQuery] = useState("");
+    const searchInputRef = useRef<HTMLInputElement>(null);
 
     useEffect(() => {
         const handleScroll = () => {
@@ -22,6 +29,28 @@ export default function Navbar() {
         window.addEventListener("scroll", handleScroll);
         return () => window.removeEventListener("scroll", handleScroll);
     }, []);
+
+    // Active Search Effect
+    useEffect(() => {
+        if (searchQuery.trim().length > 0) {
+            router.push(`/search?q=${encodeURIComponent(searchQuery)}`);
+        } else if (searchOpen && pathname === '/search') {
+            // If they clear the search and are on the search page, maybe go home?
+            router.push('/');
+        }
+    }, [searchQuery, router, searchOpen, pathname]);
+
+    const toggleSearch = () => {
+        if (searchOpen) {
+            setSearchOpen(false);
+            setSearchQuery("");
+        } else {
+            setSearchOpen(true);
+            setTimeout(() => {
+                searchInputRef.current?.focus();
+            }, 100);
+        }
+    };
 
     const navItems = [
         { label: "Home", href: "/" },
@@ -62,9 +91,40 @@ export default function Navbar() {
 
                 {/* Right Side: Icons */}
                 <div className="flex items-center gap-4 lg:gap-6">
-                    <Link href="/search" className="text-white hover:text-gray-300 transition">
-                        <Search className="w-5 h-5 lg:w-6 lg:h-6" strokeWidth={2.5} />
-                    </Link>
+                    {/* Animated Search Bar */}
+                    <div className="flex items-center">
+                        <AnimatePresence>
+                            {searchOpen && (
+                                <motion.div
+                                    initial={{ width: 0, opacity: 0 }}
+                                    animate={{ width: "320px", opacity: 1 }}
+                                    exit={{ width: 0, opacity: 0 }}
+                                    transition={{ duration: 0.6, ease: "easeInOut" }}
+                                    className="overflow-hidden flex items-center bg-black/80 border border-white/50 rounded-full py-1.5 px-3"
+                                >
+                                    <Search className="w-5 h-5 text-white mr-1 flex-shrink-0" strokeWidth={2.5} />
+                                    <input
+                                        ref={searchInputRef}
+                                        type="text"
+                                        placeholder="Titles, people, genres"
+                                        value={searchQuery}
+                                        onChange={(e) => setSearchQuery(e.target.value)}
+                                        className="bg-transparent border-none text-white text-sm focus:outline-none px-3 w-full"
+                                    />
+                                    <X
+                                        className="w-4 h-4 text-white mr-2 cursor-pointer flex-shrink-0"
+                                        onClick={toggleSearch}
+                                    />
+                                </motion.div>
+                            )}
+                        </AnimatePresence>
+
+                        {!searchOpen && (
+                            <button onClick={toggleSearch} className="text-white hover:text-gray-300 transition cursor-pointer">
+                                <Search className="w-5 h-5 lg:w-6 lg:h-6" strokeWidth={2.5} />
+                            </button>
+                        )}
+                    </div>
 
                     <span className="hidden lg:block text-white text-sm font-semibold cursor-pointer hover:text-gray-300 transition">
                         Kids

@@ -4,6 +4,17 @@ import MovieCard from "./MovieCard";
 import { ChevronLeft, ChevronRight } from "lucide-react";
 import { useRef } from "react";
 import Link from "next/link";
+import { motion } from "framer-motion";
+
+const rowVariants = {
+    hidden: { opacity: 0 },
+    visible: {
+        opacity: 1,
+        transition: {
+            staggerChildren: 0.1
+        }
+    }
+};
 
 interface MovieRowProps {
     title: string;
@@ -52,8 +63,12 @@ export default function MovieRow({ title, movies, categoryId }: MovieRowProps) {
             </button>
 
             {/* Scrollable Container */}
-            <div
+            <motion.div
                 ref={rowRef}
+                variants={rowVariants}
+                initial="hidden"
+                whileInView="visible"
+                viewport={{ once: true, margin: "-50px" }}
                 className="flex gap-4 overflow-x-auto no-scrollbar pb-8 pt-4 px-2 -mx-2 snap-x scroll-smooth"
             >
                 {movies.map((movie, index) => (
@@ -61,7 +76,7 @@ export default function MovieRow({ title, movies, categoryId }: MovieRowProps) {
                         <MovieCard movie={movie} />
                     </div>
                 ))}
-            </div>
+            </motion.div>
         </div>
     );
 }

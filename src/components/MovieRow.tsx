@@ -56,8 +56,8 @@ export default function MovieRow({ title, movies, categoryId }: MovieRowProps) {
                 ref={rowRef}
                 className="flex gap-4 overflow-x-auto no-scrollbar pb-8 pt-4 px-2 -mx-2 snap-x scroll-smooth"
             >
-                {movies.map((movie) => (
-                    <div key={movie.id} className="snap-start shrink-0">
+                {movies.map((movie, index) => (
+                    <div key={`${categoryId || 'row'}-${movie.id}-${index}`} className="snap-start shrink-0">
                         <MovieCard movie={movie} />
                     </div>
                 ))}

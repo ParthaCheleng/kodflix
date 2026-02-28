@@ -11,13 +11,13 @@ export default function MovieCard({ movie }: MovieCardProps) {
     const title = movie.title || movie.name || movie.original_name;
 
     return (
-        <div className="relative min-w-[140px] md:min-w-[180px] lg:min-w-[220px] aspect-[2/3] rounded-md overflow-hidden group cursor-pointer transition-transform duration-300 transform hover:scale-110 hover:z-20">
+        <div className="relative min-w-[110px] md:min-w-[160px] lg:min-w-[200px] xl:min-w-[240px] aspect-[2/3] rounded-md overflow-hidden group cursor-pointer transition-transform duration-300 transform hover:scale-110 hover:z-20">
             <Image
                 src={getImageUrl(posterPath, "w500")}
                 alt={title}
                 fill
                 className="object-cover rounded-md"
-                sizes="(max-width: 768px) 140px, (max-width: 1024px) 180px, 220px"
+                sizes="(max-width: 640px) 110px, (max-width: 768px) 160px, (max-width: 1024px) 200px, 240px"
             />
             {/* Hover Overlay */}
             <div className="absolute inset-0 bg-black/60 opacity-0 group-hover:opacity-100 transition-opacity duration-300 flex flex-col justify-end p-4">

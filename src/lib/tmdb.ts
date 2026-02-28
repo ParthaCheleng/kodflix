@@ -83,7 +83,7 @@ export const getMoviesByCategory = async (endpoint: string, extraParams: Record<
 };
 
 export const getImageUrl = (path: string, size: string = 'original') => {
-    if (!path) return '';
+    if (!path) return 'https://images.unsplash.com/photo-1616530940355-351fabd9524b'; // Fallback for missing posters
     if (path.startsWith('http')) return path; // Support absolute paths for fallback
     return `https://image.tmdb.org/t/p/${size}${path}`;
 };

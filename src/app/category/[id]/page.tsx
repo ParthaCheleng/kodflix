@@ -17,6 +17,15 @@ export default async function CategoryPage({
     const category = CATEGORY_MAP[id];
     if (!category) return notFound();
 
+    if (category.isPlaceholder) {
+        return (
+            <div className="min-h-screen bg-[#141414] pt-28 px-8 lg:px-16 flex flex-col items-center justify-center text-center">
+                <h1 className="text-4xl font-bold text-white mb-4">{category.title}</h1>
+                <p className="text-gray-400 text-lg">This feature will be fully functional once backend integration is complete.</p>
+            </div>
+        );
+    }
+
     const currentPage = parseInt(page || '1', 10);
     const data = await getMoviesByCategory(category.endpoint, category.extraParams || {}, currentPage);
 
@@ -24,7 +33,7 @@ export default async function CategoryPage({
     const totalPages = Math.min(data.total_pages || 1, 500); // TMDB limits to 500 pages usually
 
     return (
-        <div className="min-h-screen bg-[#141414] pt-16 px-8 lg:px-16 pb-20 w-full mb-12">
+        <div className="min-h-screen bg-[#141414] pt-28 px-8 lg:px-16 pb-20 w-full mb-12">
             <h1 className="text-3xl font-bold text-white mb-8 border-l-4 border-red-600 pl-4">{category.title}</h1>
 
             <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 gap-y-12 gap-x-6">

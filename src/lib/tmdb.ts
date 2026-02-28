@@ -1,5 +1,5 @@
 const BASE_URL = 'https://api.themoviedb.org/3';
-const API_KEY = process.env.TMDB_API_KEY;
+const API_KEY = process.env.NEXT_PUBLIC_TMDB_API_KEY || process.env.TMDB_API_KEY;
 
 const MOCK_DATA = {
     results: [
@@ -7,8 +7,9 @@ const MOCK_DATA = {
             id: 1,
             title: "Money Heist - Fallback",
             name: "Money Heist - Fallback",
-            backdrop_path: "https://via.placeholder.com/1280x720/141414/FFFFFF?text=No+Backdrop", // Absolute external image
-            poster_path: "https://via.placeholder.com/500x750/141414/FFFFFF?text=No+Poster",
+            media_type: "tv",
+            backdrop_path: "https://images.unsplash.com/photo-1626814026160-2237a95fc5a0",
+            poster_path: "https://images.unsplash.com/photo-1626814026160-2237a95fc5a0",
             overview: "Eight thieves take hostages and lock themselves in the Royal Mint of Spain as a criminal mastermind manipulates the police to carry out his plan.",
             vote_average: 8.8,
             popularity: 100,
@@ -20,8 +21,9 @@ const MOCK_DATA = {
             id: 2,
             title: "Stranger Things - Fallback",
             name: "Stranger Things - Fallback",
-            backdrop_path: "https://via.placeholder.com/1280x720/141414/FFFFFF?text=No+Backdrop", // Absolute external image
-            poster_path: "https://via.placeholder.com/500x750/141414/FFFFFF?text=No+Poster",
+            media_type: "tv",
+            backdrop_path: "https://images.unsplash.com/photo-1616530940355-351fabd9524b", // Absolute external image
+            poster_path: "https://images.unsplash.com/photo-1616530940355-351fabd9524b",
             overview: "When a young boy vanishes, a small town uncovers a mystery involving secret experiments, terrifying supernatural forces and one strange little girl.",
             vote_average: 8.6,
             popularity: 90
@@ -85,8 +87,8 @@ export const getMoviesByCategory = async (endpoint: string, extraParams: Record<
 export const getImageUrl = (path: string, size: string = 'original') => {
     if (!path) {
         return size === 'original'
-            ? 'https://via.placeholder.com/1280x720/141414/FFFFFF?text=KODFLIX'
-            : 'https://via.placeholder.com/500x750/141414/FFFFFF?text=KODFLIX'; // Fallback for missing posters
+            ? 'https://images.unsplash.com/photo-1626814026160-2237a95fc5a0'
+            : 'https://images.unsplash.com/photo-1616530940355-351fabd9524b'; // Fallback for missing posters
     }
     if (path.startsWith('http')) return path; // Support absolute paths for fallback
     return `https://image.tmdb.org/t/p/${size}${path}`;

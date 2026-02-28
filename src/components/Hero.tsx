@@ -51,9 +51,10 @@ export default function Hero({ movieDetails: initialServerMovie }: HeroProps) {
     const overview = displayMovie.overview;
     const rating = displayMovie.vote_average ? displayMovie.vote_average.toFixed(1) : "N/A";
 
-    const trailer = displayMovie?.videos?.results?.find(
-        (vid: any) => vid.type === "Trailer" && vid.site === "YouTube"
-    ) || displayMovie?.videos?.results?.[0];
+    // Only play trailers for Movies, hide trailers for TV Shows
+    const trailer = displayMovie.media_type === 'movie' || !displayMovie.media_type
+        ? displayMovie?.videos?.results?.find((vid: any) => vid.type === "Trailer" && vid.site === "YouTube") || displayMovie?.videos?.results?.[0]
+        : null;
 
     return (
         <AnimatePresence mode="wait">

@@ -11,6 +11,7 @@ export default function Navbar() {
     const router = useRouter();
     const [isScrolled, setIsScrolled] = useState(false);
     const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
+    const [profileDropdownOpen, setProfileDropdownOpen] = useState(false);
 
     // Auth State
     const [user, setUser] = useState<{ username: string, token: string } | null>(null);
@@ -170,15 +171,44 @@ export default function Navbar() {
                         <div className="absolute top-0 right-0 w-2 h-2 bg-red-600 rounded-full border border-[#141414]"></div>
                     </button>
 
-                    {/* Auth avatar & Logout */}
+                    {/* Auth avatar & Logout Dropdown */}
                     {user ? (
-                        <div className="flex items-center gap-3">
-                            <div className="w-8 h-8 rounded bg-red-600 flex items-center justify-center font-bold text-white text-sm cursor-pointer border border-transparent hover:border-white transition-colors" title={user.username}>
-                                {user.username.charAt(0).toUpperCase()}
+                        <div className="relative">
+                            <div
+                                className="flex items-center gap-3 cursor-pointer group"
+                                onClick={() => setProfileDropdownOpen(!profileDropdownOpen)}
+                            >
+                                <div className="w-8 h-8 rounded bg-red-600 flex items-center justify-center font-bold text-white text-sm border border-transparent group-hover:border-white transition-colors" title={user.username}>
+                                    {user.username.charAt(0).toUpperCase()}
+                                </div>
+                                <div className="hidden lg:block">
+                                    <svg className={`w-4 h-4 text-white transition-transform ${profileDropdownOpen ? 'rotate-180' : ''}`} fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7"></path></svg>
+                                </div>
                             </div>
-                            <button onClick={handleLogout} className="hidden lg:block text-xs font-semibold text-gray-300 hover:text-white transition">
-                                Sign Out
-                            </button>
+
+                            {/* Dropdown Menu */}
+                            <AnimatePresence>
+                                {profileDropdownOpen && (
+                                    <motion.div
+                                        initial={{ opacity: 0, y: 10 }}
+                                        animate={{ opacity: 1, y: 0 }}
+                                        exit={{ opacity: 0, y: 10 }}
+                                        transition={{ duration: 0.2 }}
+                                        className="absolute right-0 mt-4 w-48 bg-black border border-gray-800 rounded-md shadow-2xl py-2 flex flex-col z-50"
+                                    >
+                                        <div className="px-4 py-3 border-b border-gray-800">
+                                            <p className="text-sm font-semibold text-white truncate">Profile</p>
+                                            <p className="text-xs text-gray-400 mt-1 truncate">{user.username}</p>
+                                        </div>
+                                        <button
+                                            onClick={handleLogout}
+                                            className="w-full text-left px-4 py-3 text-sm font-semibold text-gray-300 hover:text-white hover:bg-gray-900 transition-colors"
+                                        >
+                                            Sign out of Kodflix
+                                        </button>
+                                    </motion.div>
+                                )}
+                            </AnimatePresence>
                         </div>
                     ) : (
                         <button onClick={() => window.location.href = 'http://localhost:5173/login'} className="bg-red-600 text-white px-4 py-1.5 rounded font-semibold text-sm hover:bg-red-700 transition">

@@ -23,10 +23,12 @@ export default function Hero({ movieDetails: initialServerMovie }: HeroProps) {
     useEffect(() => {
         // If a user clicks a movie card, we get activeHero. Use activeHero, else fallback to initialServerMovie.
         const currentMovie = activeHero?.movieData || initialServerMovie;
+        // Reset display state immediately to trigger AnimatePresence transition
+        setDisplayMovie(null);
 
         const fetchDeepDetails = async () => {
             setIsLoading(true);
-            if (currentMovie && currentMovie.id && (!currentMovie.videos || !currentMovie.videos.results)) {
+            if (currentMovie && currentMovie.id) {
                 try {
                     // TMDB uses 'title' for movies, and 'name' for TV series
                     const mediaType = currentMovie.media_type || (currentMovie.name && !currentMovie.title ? 'tv' : 'movie');

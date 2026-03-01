@@ -39,7 +39,10 @@ const MOCK_DATA = {
  */
 const fetchFromTMDB = async (endpoint: string, params: Record<string, string> = {}) => {
     // If there is no API key at all, skip the network call entirely
-    if (!API_KEY) return MOCK_DATA;
+    if (!API_KEY) {
+        console.warn("fetchFromTMDB WARNING: No API Key found in environment variables!");
+        return MOCK_DATA;
+    }
 
     const queryParams = new URLSearchParams({
         api_key: API_KEY,
@@ -50,21 +53,23 @@ const fetchFromTMDB = async (endpoint: string, params: Record<string, string> = 
 
     try {
         const controller = new AbortController();
-        const timeoutId = setTimeout(() => controller.abort(), 8000);
+        const timeoutId = setTimeout(() => controller.abort(), 15000);
 
         const response = await fetch(url, {
             signal: controller.signal,
-            cache: 'no-store', // Prevent Next.js from caching failed responses
+            next: { revalidate: 300 }, // Cache successfully fetched data for 5 minutes instead of hammering TMDB
         });
 
         clearTimeout(timeoutId);
 
         if (!response.ok) {
+            console.warn(`fetchFromTMDB WARNING: Network response was not ok. Status: ${response.status} ${response.statusText} for URL ${url}`);
             return MOCK_DATA;
         }
 
         return await response.json();
-    } catch {
+    } catch (error) {
+        console.warn(`fetchFromTMDB EXCEPTION: Failed fetching ${url} - falling back to mock data.`);
         // Silently fall back – covers TypeError (network down), AbortError (timeout), etc.
         return MOCK_DATA;
     }

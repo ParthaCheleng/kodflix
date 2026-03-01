@@ -5,12 +5,14 @@ import MotionGrid from "@/components/MotionGrid";
 import Link from "next/link";
 import { Search } from "lucide-react";
 
-export default async function SearchPage({
-    searchParams
-}: {
-    searchParams: Promise<{ q?: string, page?: string }>
+export const dynamic = 'force-dynamic';
+
+export default async function SearchPage(props: {
+    searchParams?: Promise<{ q?: string, page?: string }>
 }) {
-    const { q, page } = await searchParams;
+    const searchParams = await props.searchParams;
+    const q = searchParams?.q;
+    const page = searchParams?.page;
     const currentPage = parseInt(page || '1', 10);
 
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
@@ -38,13 +40,15 @@ export default async function SearchPage({
 
 
                 {!q && (
-                    <div className="flex items-center justify-center h-[40vh]">
+                    <div className="flex items-center justify-center h-[40vh] mt-10">
                         <p className="text-gray-500 text-xl font-medium">Enter a term to search across millions of movies & TV shows.</p>
                     </div>
                 )}
 
                 {q && movies.length === 0 && (
-                    <p className="text-gray-400 text-lg">No results found for "<span className="text-white">{q}</span>".</p>
+                    <div className="flex items-center justify-center h-[40vh] mt-10">
+                        <p className="text-gray-400 text-lg">No results found for "<span className="text-white">{q}</span>".</p>
+                    </div>
                 )}
 
                 <MotionGrid className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 gap-y-12 gap-x-6">
@@ -57,9 +61,9 @@ export default async function SearchPage({
                 {totalPages > 1 && movies.length > 0 && (
                     <div className="flex justify-center items-center mt-16 gap-6 pt-12">
                         {currentPage > 1 ? (
-                            <Link href={`/search?q=${q}&page=${currentPage - 1}`} className="px-6 py-2 bg-zinc-800 text-white rounded font-semibold hover:bg-zinc-700 transition">
+                            <a href={`/search?q=${q}&page=${currentPage - 1}`} className="px-6 py-2 bg-zinc-800 text-white rounded font-semibold hover:bg-zinc-700 transition">
                                 Previous
-                            </Link>
+                            </a>
                         ) : (
                             <div className="px-6 py-2 bg-zinc-900/50 text-gray-600 rounded font-semibold cursor-not-allowed">Previous</div>
                         )}
@@ -67,9 +71,9 @@ export default async function SearchPage({
                         <span className="text-gray-400 font-medium">Page <span className="text-white">{currentPage}</span> of {totalPages}</span>
 
                         {currentPage < totalPages ? (
-                            <Link href={`/search?q=${q}&page=${currentPage + 1}`} className="px-6 py-2 bg-zinc-800 text-white rounded font-semibold hover:bg-zinc-700 transition">
+                            <a href={`/search?q=${q}&page=${currentPage + 1}`} className="px-6 py-2 bg-zinc-800 text-white rounded font-semibold hover:bg-zinc-700 transition">
                                 Next
-                            </Link>
+                            </a>
                         ) : (
                             <div className="px-6 py-2 bg-zinc-900/50 text-gray-600 rounded font-semibold cursor-not-allowed">Next</div>
                         )}

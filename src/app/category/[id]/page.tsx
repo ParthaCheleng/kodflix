@@ -6,15 +6,16 @@ import MotionGrid from "@/components/MotionGrid";
 import Link from "next/link";
 import { notFound } from "next/navigation";
 
-export default async function CategoryPage({
-    params,
-    searchParams
-}: {
+export const dynamic = 'force-dynamic';
+
+export default async function CategoryPage(props: {
     params: Promise<{ id: string }>,
-    searchParams: Promise<{ page?: string }>
+    searchParams?: Promise<{ page?: string }>
 }) {
-    const { id } = await params;
-    const { page } = await searchParams;
+    const params = await props.params;
+    const searchParams = await props.searchParams;
+    const id = params?.id;
+    const page = searchParams?.page;
 
     const category = CATEGORY_MAP[id];
     if (!category) return notFound();
@@ -55,9 +56,9 @@ export default async function CategoryPage({
                 {totalPages > 1 && (
                     <div className="flex justify-center items-center mt-16 gap-6">
                         {currentPage > 1 ? (
-                            <Link href={`/category/${id}?page=${currentPage - 1}`} className="px-6 py-2 bg-zinc-800 text-white rounded font-semibold hover:bg-zinc-700 transition">
+                            <a href={`/category/${id}?page=${currentPage - 1}`} className="px-6 py-2 bg-zinc-800 text-white rounded font-semibold hover:bg-zinc-700 transition">
                                 Previous
-                            </Link>
+                            </a>
                         ) : (
                             <div className="px-6 py-2 bg-zinc-900/50 text-gray-600 rounded font-semibold cursor-not-allowed">Previous</div>
                         )}
@@ -65,9 +66,9 @@ export default async function CategoryPage({
                         <span className="text-gray-400 font-medium">Page <span className="text-white">{currentPage}</span> of {totalPages}</span>
 
                         {currentPage < totalPages ? (
-                            <Link href={`/category/${id}?page=${currentPage + 1}`} className="px-6 py-2 bg-zinc-800 text-white rounded font-semibold hover:bg-zinc-700 transition">
+                            <a href={`/category/${id}?page=${currentPage + 1}`} className="px-6 py-2 bg-zinc-800 text-white rounded font-semibold hover:bg-zinc-700 transition">
                                 Next
-                            </Link>
+                            </a>
                         ) : (
                             <div className="px-6 py-2 bg-zinc-900/50 text-gray-600 rounded font-semibold cursor-not-allowed">Next</div>
                         )}

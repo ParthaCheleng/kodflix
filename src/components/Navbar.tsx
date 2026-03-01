@@ -12,6 +12,40 @@ export default function Navbar() {
     const [isScrolled, setIsScrolled] = useState(false);
     const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
 
+    // Auth State
+    const [user, setUser] = useState<{ username: string, token: string } | null>(null);
+
+    // Initial Auth Check
+    useEffect(() => {
+        // Safe check for window
+        if (typeof window !== 'undefined') {
+            const urlParams = new URL(window.location.href).searchParams;
+            const tokenQuery = urlParams.get('token');
+            const usernameQuery = urlParams.get('username');
+
+            if (tokenQuery && usernameQuery) {
+                // If returning from auth app, save state & clean URL
+                localStorage.setItem('kodflix_token', tokenQuery);
+                localStorage.setItem('kodflix_username', usernameQuery);
+                setUser({ username: usernameQuery, token: tokenQuery });
+                window.history.replaceState({}, document.title, window.location.pathname);
+            } else {
+                // Otherwise load from local storage
+                const storedToken = localStorage.getItem('kodflix_token');
+                const storedUsername = localStorage.getItem('kodflix_username');
+                if (storedToken && storedUsername) {
+                    setUser({ username: storedUsername, token: storedToken });
+                }
+            }
+        }
+    }, []);
+
+    const handleLogout = () => {
+        localStorage.removeItem('kodflix_token');
+        localStorage.removeItem('kodflix_username');
+        setUser(null);
+    };
+
     // Search State
     const [searchOpen, setSearchOpen] = useState(false);
     const [searchQuery, setSearchQuery] = useState("");
@@ -136,10 +170,21 @@ export default function Navbar() {
                         <div className="absolute top-0 right-0 w-2 h-2 bg-red-600 rounded-full border border-[#141414]"></div>
                     </button>
 
-                    {/* User Avatar Placeholder */}
-                    <div className="w-8 h-8 rounded bg-red-600 overflow-hidden cursor-pointer border border-transparent hover:border-white transition-colors">
-                        <div className="w-full h-full flex items-center justify-center text-xs font-bold text-white">:-]</div>
-                    </div>
+                    {/* Auth avatar & Logout */}
+                    {user ? (
+                        <div className="flex items-center gap-3">
+                            <div className="w-8 h-8 rounded bg-red-600 flex items-center justify-center font-bold text-white text-sm cursor-pointer border border-transparent hover:border-white transition-colors" title={user.username}>
+                                {user.username.charAt(0).toUpperCase()}
+                            </div>
+                            <button onClick={handleLogout} className="hidden lg:block text-xs font-semibold text-gray-300 hover:text-white transition">
+                                Sign Out
+                            </button>
+                        </div>
+                    ) : (
+                        <button onClick={() => window.location.href = 'http://localhost:5173/login'} className="bg-red-600 text-white px-4 py-1.5 rounded font-semibold text-sm hover:bg-red-700 transition">
+                            Sign In
+                        </button>
+                    )}
 
                     {/* Mobile Hamburger Toggle */}
                     <button
